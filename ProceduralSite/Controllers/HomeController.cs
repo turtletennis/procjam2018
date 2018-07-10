@@ -39,7 +39,7 @@ namespace ProceduralSite.Controllers
 
         public ActionResult Map()
         {
-            var mapCells = GetMapTiles(16);
+            var mapCells = GetMapTiles(32);
             var mapTiles = mapCells.Select(
                     row => row.Select(cell => new MapTile(cell)).ToList()
                 ).ToList();
@@ -117,14 +117,14 @@ namespace ProceduralSite.Controllers
             int tileIndex =
                 1 + rand.Next(Enum.GetNames(typeof(TileType)).Length -
                               1); //avoid default not set by adding 1, subtract 1 from rand max to avoid overflow
-            if (rand.Next(2) == 1)
-            {
-                return TileType.Grass;
-            }
-            else
-            {
-                return TileType.Water;
-            }
+            //if (rand.Next(2) == 1)
+            //{
+            //    return TileType.Grass;
+            //}
+            //else
+            //{
+            //    return TileType.Water;
+            //}
             return (TileType)tileIndex;
         }
 
@@ -139,8 +139,14 @@ namespace ProceduralSite.Controllers
                 return TileType.NotSet;
             }
 
-            int adjacentGrassCount = 0;
-            int adjacentWaterCount = 0;
+            Dictionary<TileType, int> adjacentTiles = new Dictionary<TileType, int>();
+            foreach (TileType tileType in Enum.GetValues(typeof(TileType)))
+            {
+                adjacentTiles.Add(tileType, 0);
+            }
+            {
+
+            }
             TileType intermediateTile = TileType.NotSet;
             for (int radius = 1; radius < size; radius++)
             {
@@ -155,10 +161,11 @@ namespace ProceduralSite.Controllers
                         gridCell = grid[yLocation + radius][x];
                         if (gridCell != TileType.NotSet && intermediateTile != TileType.NotSet) intermediateTile = gridCell;
 
-                        if (radius == 1)
+                        if (radius <= 2)
                         {
-                            if (gridCell == TileType.Grass) adjacentGrassCount++;
-                            if (gridCell == TileType.Water) adjacentWaterCount++;
+
+                            adjacentTiles[gridCell]++;
+
                         }
                     }
                     // top row
@@ -167,10 +174,11 @@ namespace ProceduralSite.Controllers
                         gridCell = grid[yLocation - radius][x];
                         if (gridCell != TileType.NotSet && intermediateTile != TileType.NotSet) intermediateTile = gridCell;
 
-                        if (radius == 1)
+                        if (radius <= 2)
                         {
-                            if (gridCell == TileType.Grass) adjacentGrassCount++;
-                            if (gridCell == TileType.Water) adjacentWaterCount++;
+
+                            adjacentTiles[gridCell]++;
+
                         }
 
                     }
@@ -188,8 +196,9 @@ namespace ProceduralSite.Controllers
 
                         if (radius <= 2)
                         {
-                            if (gridCell == TileType.Grass) adjacentGrassCount++;
-                            if (gridCell == TileType.Water) adjacentWaterCount++;
+
+                            adjacentTiles[gridCell]++;
+
                         }
                     }
                     // right row
@@ -200,8 +209,9 @@ namespace ProceduralSite.Controllers
 
                         if (radius <= 2)
                         {
-                            if (gridCell == TileType.Grass) adjacentGrassCount++;
-                            if (gridCell == TileType.Water) adjacentWaterCount++;
+
+                            adjacentTiles[gridCell]++;
+
                         }
                     }
 
@@ -210,7 +220,25 @@ namespace ProceduralSite.Controllers
 
             }
 
-            if (adjacentWaterCount > 1 && adjacentGrassCount > 1 && adjacentWaterCount+adjacentGrassCount>3) intermediateTile = TileType.Sand;
+            if (adjacentTiles[TileType.Mountain] == 9)
+            {
+                intermediateTile = TileType.Snow;
+            }
+            if (adjacentTiles[TileType.Snow] > 1)
+            {
+                intermediateTile = TileType.Mountain;
+            }
+            else if (adjacentTiles[TileType.Mountain] > 2)
+            {
+                intermediateTile = TileType.Dirt;
+            }
+            else if (adjacentTiles[TileType.Dirt] + adjacentTiles[TileType.Mountain] == 9)
+            {
+                intermediateTile = TileType.Mountain;
+            }
+            if (adjacentTiles[TileType.Water] > 1 && adjacentTiles[TileType.Grass] > 1 &&
+                adjacentTiles[TileType.Water] + adjacentTiles[TileType.Grass] > 3
+                ) intermediateTile = TileType.Sand;
             return intermediateTile;
         }
 

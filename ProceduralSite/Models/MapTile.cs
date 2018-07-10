@@ -7,7 +7,7 @@ namespace ProceduralSite.Models
 {
     public enum TileType
     {
-        NotSet=0,Grass=1, Sand=2,Water=3
+        NotSet=0, Water = 1,Grass =2, Sand=3,Dirt=4,Mountain=5,Snow=6
     }
     public class MapTile
     {
@@ -30,6 +30,12 @@ namespace ProceduralSite.Models
                         return "water.png";
                     case TileType.Sand:
                         return "sand.png";
+                    case TileType.Dirt:
+                        return "dirt.png";
+                    case TileType.Mountain:
+                        return "mountain.png";
+                    case TileType.Snow:
+                        return "snow.png";
                     default:
                         return "notset.png";
                 }

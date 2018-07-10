@@ -1,21 +1,34 @@
 ﻿@model List<List<ProceduralSite.Models.MapTile>>
 @{
     ViewBag.Title = "Map";
+    Layout = null;
 
 }
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    @*<style>
-            td { width: 30px;}
-            tr { height: 30px;}
-        </style>*@
+    <style>
+
+        td {
+            padding: 0;
+            margin: 0;
+        }
+        tr {
+            padding: 0;
+            margin: 0;
+        }
+        img {
+            padding: 0;
+            margin: 0;
+            display:inline-block;
+        }
+    </style>
     <title></title>
 </head>
 <body>
     <div>
-        <table>
+        @*<table>
 
             @for (int y = 0; y < Model.Count; y++)
             {
@@ -23,12 +36,20 @@
                     @for (int x = 0; x < Model.Count; x++)
                     {
 
-                        <td><img src="~/Content/@Model[y][x].FileName" /></td>
+                        <td><img src="~/Content/@Model[y][x].FileName" width="32" height="32" /></td>
                     }
                 </tr>
             }
 
-        </table>
+        </table>*@
+
+        @for (int y = 0; y < Model.Count; y++)
+        {
+            
+                for (int x = 0; x < Model.Count; x++)
+                {<img src="~/Content/@Model[y][x].FileName" width="32" height="32" />}
+            <br/>
+        }
     </div>
 </body>
 </html>
