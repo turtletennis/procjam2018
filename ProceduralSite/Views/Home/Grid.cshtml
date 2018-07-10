@@ -1,0 +1,36 @@
+﻿@model ProceduralSite.Models.GridModel
+@{
+    Layout = null;
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    @*<style>
+        td { width: 30px;}
+        tr { height: 30px;}
+    </style>*@
+    <title></title>
+</head>
+<body>
+<div>
+    <table>
+        
+        @for (int y = 0; y < Model.size; y++)
+        {
+            <tr>
+                @for (int x = 0; x < Model.size; x++)
+                {
+
+                    <td><img src="~/Content/@Model.grid[y][x].FileName" /></td>
+                }
+            </tr>
+        }
+
+    </table>
+</div>
+</body>
+</html>

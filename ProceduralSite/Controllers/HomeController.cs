@@ -31,7 +31,7 @@ namespace ProceduralSite.Controllers
 
         public ActionResult Grid()
         {
-            
+
             var gridCells = GetGridCells();
             var gridModel = new GridModel(gridCells);
             return View(gridModel);
@@ -39,7 +39,7 @@ namespace ProceduralSite.Controllers
 
         public ActionResult Map()
         {
-            var mapCells = GetMapTiles(8);
+            var mapCells = GetMapTiles(16);
             var mapTiles = mapCells.Select(
                     row => row.Select(cell => new MapTile(cell)).ToList()
                 ).ToList();
@@ -50,13 +50,13 @@ namespace ProceduralSite.Controllers
         {
             GridGenerator generator = new GridGenerator(6);
             generator.Generate();
-            
+
             List<List<GridCell>> gridCells = new List<List<GridCell>>();
             var grid = generator.Grid;
-            for(int y=0; y<grid.Count; y++) 
+            for (int y = 0; y < grid.Count; y++)
             {
                 gridCells.Add(new List<GridCell>());
-                gridCells[y].AddRange(grid[y].Select(c=>new GridCell(c)));
+                gridCells[y].AddRange(grid[y].Select(c => new GridCell(c)));
             }
 
             return gridCells;
@@ -100,7 +100,7 @@ namespace ProceduralSite.Controllers
                 {
                     if (mapTileGrid[y][x] == TileType.NotSet)
                     {
-                        mapTileGrid[y][x] =  GetIntermidiateTileType(x, y, mapTileGrid);
+                        mapTileGrid[y][x] = GetIntermediateTileType(x, y, mapTileGrid);
                         if (mapTileGrid[y][x] == TileType.NotSet)
                         {
                             mapTileGrid[y][x] = GetRandomMapTileType(rand, mapTileGrid, y, x);
@@ -117,12 +117,20 @@ namespace ProceduralSite.Controllers
             int tileIndex =
                 1 + rand.Next(Enum.GetNames(typeof(TileType)).Length -
                               1); //avoid default not set by adding 1, subtract 1 from rand max to avoid overflow
-            return (TileType) tileIndex;
+            if (rand.Next(2) == 1)
+            {
+                return TileType.Grass;
+            }
+            else
+            {
+                return TileType.Water;
+            }
+            return (TileType)tileIndex;
         }
 
-        private TileType GetIntermidiateTileType(int xLocation, int yLocation, List<List<TileType>> grid)
+        private TileType GetIntermediateTileType(int xLocation, int yLocation, List<List<TileType>> grid)
         {
-            
+
             int size = grid.Count;
 
             if (xLocation > size || yLocation > size ||
@@ -131,42 +139,70 @@ namespace ProceduralSite.Controllers
                 return TileType.NotSet;
             }
 
+            int adjacentGrassCount = 0;
+            int adjacentWaterCount = 0;
+            TileType intermediateTile = TileType.NotSet;
             for (int radius = 1; radius < size; radius++)
             {
-                
-                TileType gridCell=TileType.NotSet;
+
+                TileType gridCell = TileType.NotSet;
                 for (int x = xLocation - radius; x < xLocation + radius && xLocation + radius < size; x++)
                 {
-                    if(x<0) continue;
+                    if (x < 0) continue;
                     // bottom row
                     if (yLocation + radius < size)
                     {
                         gridCell = grid[yLocation + radius][x];
-                        if (gridCell != TileType.NotSet) return gridCell;
+                        if (gridCell != TileType.NotSet && intermediateTile != TileType.NotSet) intermediateTile = gridCell;
+
+                        if (radius == 1)
+                        {
+                            if (gridCell == TileType.Grass) adjacentGrassCount++;
+                            if (gridCell == TileType.Water) adjacentWaterCount++;
+                        }
                     }
                     // top row
                     if (yLocation - radius > 0)
                     {
                         gridCell = grid[yLocation - radius][x];
-                        if (gridCell != TileType.NotSet) return gridCell;
+                        if (gridCell != TileType.NotSet && intermediateTile != TileType.NotSet) intermediateTile = gridCell;
+
+                        if (radius == 1)
+                        {
+                            if (gridCell == TileType.Grass) adjacentGrassCount++;
+                            if (gridCell == TileType.Water) adjacentWaterCount++;
+                        }
+
                     }
 
                 }
                 //skip the corners, already done in previous loop
-                for (int y = yLocation - radius + 1; y < yLocation + radius -1 && yLocation + radius < size; y++)
+                for (int y = yLocation - radius + 1; y < yLocation + radius - 1 && yLocation + radius < size; y++)
                 {
-                    if(yLocation-radius+1 <0) continue;
+                    if (yLocation - radius + 1 < 0) continue;
                     // left row
-                    if (yLocation + radius < size && xLocation - radius>0)
+                    if (yLocation + radius < size && xLocation - radius > 0)
                     {
                         gridCell = grid[y][xLocation - radius];
-                        if (gridCell != TileType.NotSet) return gridCell;
+                        if (gridCell != TileType.NotSet) intermediateTile = gridCell;
+
+                        if (radius <= 2)
+                        {
+                            if (gridCell == TileType.Grass) adjacentGrassCount++;
+                            if (gridCell == TileType.Water) adjacentWaterCount++;
+                        }
                     }
                     // right row
                     if (yLocation - radius > 0 && xLocation + radius < size)
                     {
                         gridCell = grid[y][xLocation + radius];
-                        if (gridCell != TileType.NotSet) return gridCell;
+                        if (gridCell != TileType.NotSet) intermediateTile = gridCell;
+
+                        if (radius <= 2)
+                        {
+                            if (gridCell == TileType.Grass) adjacentGrassCount++;
+                            if (gridCell == TileType.Water) adjacentWaterCount++;
+                        }
                     }
 
                 }
@@ -174,8 +210,8 @@ namespace ProceduralSite.Controllers
 
             }
 
-
-            return TileType.NotSet;
+            if (adjacentWaterCount > 1 && adjacentGrassCount > 1 && adjacentWaterCount+adjacentGrassCount>3) intermediateTile = TileType.Sand;
+            return intermediateTile;
         }
 
     }

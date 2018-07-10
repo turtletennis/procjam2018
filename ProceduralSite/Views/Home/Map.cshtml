@@ -1,0 +1,36 @@
+﻿@model List<List<ProceduralSite.Models.MapTile>>
+@{
+    ViewBag.Title = "Map";
+
+}
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    @*<style>
+            td { width: 30px;}
+            tr { height: 30px;}
+        </style>*@
+    <title></title>
+</head>
+<body>
+    <div>
+        <table>
+
+            @for (int y = 0; y < Model.Count; y++)
+            {
+                <tr>
+                    @for (int x = 0; x < Model.Count; x++)
+                    {
+
+                        <td><img src="~/Content/@Model[y][x].FileName" /></td>
+                    }
+                </tr>
+            }
+
+        </table>
+    </div>
+</body>
+</html>
+
+
