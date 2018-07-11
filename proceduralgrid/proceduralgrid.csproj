@@ -43,6 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GridGenerator.cs" />
+    <Compile Include="ListExtensions.cs" />
+    <Compile Include="MapGenerator.cs" />
+    <Compile Include="MapTile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

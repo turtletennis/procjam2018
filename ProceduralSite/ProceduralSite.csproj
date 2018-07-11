@@ -154,7 +154,6 @@
     </Compile>
     <Compile Include="Models\GridCell.cs" />
     <Compile Include="Models\GridModel.cs" />
-    <Compile Include="Models\MapTile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -239,7 +238,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\proceduralgrid\proceduralgrid.csproj">
-      <Project>{D40EE035-BBF4-4955-A4B8-C66378695C48}</Project>
+      <Project>{d40ee035-bbf4-4955-a4b8-c66378695c48}</Project>
       <Name>proceduralgrid</Name>
     </ProjectReference>
   </ItemGroup>
